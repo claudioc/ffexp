@@ -1,0 +1,45 @@
+FFExp.php - A friendfeed exporter script - Version 1.2 (2011-01-07)
+
+Created by Claudio Cicali - <claudio.cicali@gmail.com>
+Released under the MIT license
+
+This script attempts to download your Friendfeed stream.
+
+The output is a JSON formatted file the you could use as an input for other programs.
+The stream is composed of a list of "entry" (your posts). Each entry has the list of comments and likes attached.
+
+Run it like "php ffexp.php my_ff_stream.json"
+
+If the my_ff_stream.json (or whatever name you choose) file already exists,
+it will be used to know the latest entry already fetched and break the download 
+as soon as it will be reached (sort of incremental backup). Side effect: should 
+some comments or likes have been added to already fetched entries, they will NOT
+be read (comments and likes travel with the parent entry - as a whole).
+You always need a FULL export to be sure to have, well, the FULL and updated export :)
+
+The script will also download the images and the files that could have
+been attached to each post (already downloaded assets will not be downloaded again).
+
+The first lines of this scripts contain some basic configuration
+options, like your Friendfeed username, the remote_key (if your stream is
+private) and the directory where the images and files will be downloaded into.
+
+You'll be notified every 100 posts, and every file or image downloaded
+
+Images and files are saved using a naming convention that could subsequently
+help on rebuilding the post <-> attachments relationship. Each image has
+an "i_" prefix, a "t_" for the thumbnails and an "f_" for the files. 
+After the prefix, the entry unique identifier is added (it's something like
+an hash). For files, the original file name is added too.
+
+Limits and bugs:
+
+Exporting filter/discussion (Entries the authenticated user has commented 
+on or liked) and filter/direct (direct messages) seems not to work.
+
+When you'll have the JSON export file you can use ffexp2html to render it as HTML
+
+For Friendfeed API documentation See http://friendfeed.com/api/documentation
+
+For the script ChangeLog look at the bottom of the file itself
+
