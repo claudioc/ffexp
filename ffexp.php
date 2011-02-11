@@ -151,6 +151,8 @@ $options = array
 (
   CURLOPT_HEADER          => false,
   CURLOPT_RETURNTRANSFER  => true,
+  CURLOPT_SSL_VERIFYPEER  => false,
+  CURLOPT_SSL_VERIFYHOST  => false,
   CURLOPT_FOLLOWLOCATION  => true,
   CURLOPT_USERAGENT       => "Friendfeed exporter script by Claudio Cicali",
 );

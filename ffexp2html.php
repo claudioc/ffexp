@@ -21,7 +21,7 @@
 */
  
 # Your friendfeed username
-$username = "caludio";
+$username = "";
 
 # The directory where images and files are stored
 $media_dir = "ff_media";
