@@ -32,14 +32,19 @@ an "i_" prefix, a "t_" for the thumbnails and an "f_" for the files.
 After the prefix, the entry unique identifier is added (it's something like
 an hash). For files, the original file name is added too.
 
+Resources:
+
+* Blog post with addition info: http://claudio.cicali.name/post/2011/01/how-to-export-your-friendfeed-stream-posts-and-comments/
+* Friendfeed thread about this release: http://friendfeed.com/caludio/14f99a2c/ffexp-per-gli-interessati-all-export-di
+* How to for Windows users (italian): http://www.andreabeggi.net/2011/02/24/esportare-e-salvare-un-account-friendfeed-usando-windows/
+* Friendfeed API documentation See http://friendfeed.com/api/documentation
+
 Limits and bugs:
 
 Exporting filter/discussion (Entries the authenticated user has commented 
 on or liked) and filter/direct (direct messages) seems not to work.
 
 When you'll have the JSON export file you can use ffexp2html to render it as HTML
-
-For Friendfeed API documentation See http://friendfeed.com/api/documentation
 
 For the script ChangeLog look at the bottom of the file itself
 

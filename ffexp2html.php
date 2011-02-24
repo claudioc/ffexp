@@ -73,7 +73,7 @@ while ($row = fgets($fh)) {
   }
   
   $entry = json_decode($row);
-  
+
   if ($entry) {
     
     $n++;
@@ -134,13 +134,13 @@ while ($row = fgets($fh)) {
       $via = 'from ' . html('a', $entry->via->name, array('href' => $entry->via->url, 'class' => 'e_via')); 
     }
 
-    $nc = (empty($comments)   ? '0' : count($entry->comments));
-    $nl = (empty($likes)      ? '0' : count($entry->likes));
+    $nc = (empty($comments) ? '0' : count($entry->comments));
+    $nl = (empty($likes)    ? '0' : count($entry->likes));
     
     $body .= html('li',
-               html('p', $entry->body . '&nbsp;' . html('a', '&para;', array('class' => 'e_url', 'href' => $entry->url)), array('class' => 'e_body')) .
+               html('p', $entry->body, array('class' => 'e_body')) .
                html('p', 
-                 html('span', $entry->date, array('class' => 'e_date')) .
+                 html('span',  html('a', $entry->date, array('class' => 'e_url', 'href' => $entry->url)), array('class' => 'e_date')) .
                  $via .
                  ' &ndash; ' .
                  html('span', "{$nc} comment" . ((!$nc || $nc > 1) ? 's' : ''), array('class' => 'e_nc ' . (empty($comments) ? '' : 'open_comments'))) .
@@ -274,8 +274,7 @@ function get_css() {
   }
   
   a.e_url {
-    color: silver;
-    text-decoration: none;
+    color: gray;
   }
  
   #ff_tools .e_more,
