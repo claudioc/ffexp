@@ -6,6 +6,7 @@
  * Released under the MIT license
  *
  * This script attempts to download your Friendfeed stream.
+ * The script is also able to download a specific stream (e.g. user's likes) as defined in the configuration options.
  *
  * The output is a JSON formatted file the you could use as an input for other programs.
  * The stream is composed of a list of "entry" (your posts). Each entry has the list of comments and likes attached.
@@ -57,6 +58,16 @@ $username = "";
 # Leave empty if your stream is public, or get 
 # your remote key here http://friendfeed.com/remotekey
 $remote_key = "";
+
+# The stream you want to export.
+# Leave empty if you want to export just your stream.
+# You may like to export:
+# - your discussions  "filter/discussions" (requires remote_key)
+# - your likes        "username/likes" (requires remote_key if username has a private feed, username is your username)
+# - a group feed      "groupname" (requires remote_key if group is private)
+# - a list            "list/listname" (requires remote_key)
+# See Friendfeed API Documentation for feeds http://friendfeed.com/api/documentation#feeds for further info
+$stream = "";
 
 # The directory where images and files will be downloaded (defaults to
 # the subdirectory "ff_media" just below the the directory where the script is executed)
@@ -182,9 +193,12 @@ $end_export = false;
 fwrite($fh_tmp, "[\n");
 
 $processed_entries = 0;
+if (empty($stream)) {
+  $stream = $username;
+}
 do {
   notify("Fetching page " . ($pages + 1) . "\n");
-  $url = "https://friendfeed-api.com/v2/feed/{$username}?" . http_build_query($qs);
+  $url = "https://friendfeed-api.com/v2/feed/{$stream}?" . http_build_query($qs);
   curl_setopt($ch, CURLOPT_URL, $url);
   $response = curl_exec($ch);
   $pages ++;
@@ -393,6 +407,9 @@ function save_file($rawdata, $filename) {
 
 /*
  * ChangeLog:
+ *
+ * 1.3 The script is now able to download streams other than the user's own stream 
+ *     (e.g. user's comments/likes, a group stream...).
  *
  * 1.2 The script now needs the output file as its (only) parameter. If the file
  *     already exists, it will be used to detect the last entry fetched. This
