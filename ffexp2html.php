@@ -111,7 +111,7 @@ while ($row = fgets($fh)) {
         } else {
           $href = $thumbnail->link;
         }
-        $thumbnails[] = html('a', html('img', null, array('src' => $src, 'class' => 'e_tn')), array('href' => $href));
+        $thumbnails[] = html('a', html('img', null, array('src' => $src, 'class' => 'e_tn', 'title' => isset($thumbnail->filename) ? $thumbnail->filename : false)), array('href' => $href));
       }
       if (count($thumbnails) > 1) {
         $thumbnails[] = html('span', null, array('class' => 'e_more'));
