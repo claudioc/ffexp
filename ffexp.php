@@ -271,12 +271,27 @@ function notify($m) {
   flush();
 }
 
-function download_images_for($entry) {
+function image_filename_from_headers($headers) {
+  $ma = array();
+  if (preg_match('/Content-Disposition: attachment; filename="(.*?)"/', $headers, $ma)>0) {
+    return $ma[1];
+  }
+  return false;
+}
+
+function download_images_for(&$entry) {
   global $remote_key, $username;
 
   if (!isset($entry->thumbnails) || empty($entry->thumbnails)) {
     return;
   }
+
+  $header_data = '';
+  $header_func = function($ch, $header) use (&$header_data) {
+    $header_data .= $header;
+    return strlen($header);
+  };
+
   $options = array
   (
     CURLOPT_HEADER          => false,
@@ -288,9 +303,9 @@ function download_images_for($entry) {
   if (!empty($remote_key)) {
     $options[CURLOPT_USERPWD] = "{$username}:{$remote_key}";
   }
-  
+
   $saved_idx = 1;
-  foreach ($entry->thumbnails as $tn) {
+  foreach ($entry->thumbnails as &$tn) {
     $i_saved = $t_saved = false;
     
     if (FALSE !== strpos($tn->link, '/m.friendfeed-media.com/')) {
@@ -302,13 +317,19 @@ function download_images_for($entry) {
         continue;
       }
       $ch = curl_init();
+      $header_data = '';
       curl_setopt_array($ch,$options);
       curl_setopt($ch, CURLOPT_URL, $tn->link);
+      curl_setopt($ch, CURLOPT_HEADERFUNCTION, $header_func);
       save_image(curl_exec($ch), $filename, curl_getinfo($ch, CURLINFO_CONTENT_TYPE));
+      $image_filename = image_filename_from_headers($header_data);
       curl_close ($ch);
+      if ($image_filename !== false) {
+        $tn->filename = $image_filename;
+      }
       $i_saved = true;
     }
-    
+
     # Thumbnail
     if (FALSE !== strpos($tn->url, '/m.friendfeed-media.com/')) {
       $ch = curl_init();
@@ -323,6 +344,7 @@ function download_images_for($entry) {
       curl_close ($ch);
       $t_saved = true;
     }
+    unset($tn);
     
     if ($i_saved || $t_saved) {
       $saved_idx++;
