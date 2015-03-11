@@ -1,6 +1,6 @@
 <?php
 /**
- * FFExp.php - A friendfeed exporter script - Version 1.2 (2011-01-07)
+ * FFExp.php - A friendfeed exporter script - Version 1.4 (2015-03-12)
  *
  * Created by Claudio Cicali - <claudio.cicali@gmail.com>
  * Released under the MIT license
@@ -441,6 +441,8 @@ function save_file($rawdata, $filename) {
 
 /*
  * ChangeLog:
+ *
+ * 1.4 More robust error checking 
  *
  * 1.3 The script is now able to download streams other than the user's own stream 
  *     (e.g. user's comments/likes, a group stream...).
