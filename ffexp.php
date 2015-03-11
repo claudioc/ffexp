@@ -189,6 +189,7 @@ $qs = array(
 $pages = 0;
 
 $end_export = false;
+$export_started = false;
 
 fwrite($fh_tmp, "[\n");
 
@@ -201,6 +202,17 @@ do {
   $url = "https://friendfeed-api.com/v2/feed/{$stream}?" . http_build_query($qs);
   curl_setopt($ch, CURLOPT_URL, $url);
   $response = curl_exec($ch);
+
+  if ($response === false || curl_errno($ch)) {
+
+    // We got a problem from the API, but the export was already start.
+    // Save what we have and say goodbye
+    if ($export_started) {
+      notify("We got a problem from the API. Maybe we reached the limit. The file is saved anyway.\n");
+      break;
+    }
+  }
+
   $pages ++;
   
   $data = json_decode($response);
@@ -211,7 +223,7 @@ do {
     @unlink($file_tmp);
     exit;
   }
-
+  $export_started = true;
   $entries = array();
   foreach ($data->entries as $entry) {
     
