@@ -1,6 +1,6 @@
 <?php
 /**
- * FFExp.php - A friendfeed exporter script - Version 1.4 (2015-03-12)
+ * FFExp.php - A friendfeed exporter script - Version 1.5 (2015-03-12)
  *
  * Created by Claudio Cicali - <claudio.cicali@gmail.com>
  * Released under the MIT license
@@ -190,6 +190,7 @@ $pages = 0;
 
 $end_export = false;
 $export_started = false;
+$first_previous_id = "";
 
 fwrite($fh_tmp, "[\n");
 
@@ -197,6 +198,7 @@ $processed_entries = 0;
 if (empty($stream)) {
   $stream = $username;
 }
+
 do {
   notify("Fetching page " . ($pages + 1) . "\n");
   $url = "https://friendfeed-api.com/v2/feed/{$stream}?" . http_build_query($qs);
@@ -223,10 +225,19 @@ do {
     @unlink($file_tmp);
     exit;
   }
+
   $export_started = true;
+
   $entries = array();
+
+  if ($first_previous_id == $data->entries[0]->id) {
+    // We already fetched this page: we are done
+    notify("End of the stream detected. We are done.\n");
+    break;
+  }
+
   foreach ($data->entries as $entry) {
-    
+
     if ($last_entry && ($entry->id == $last_entry->id)) {
       $end_export = TRUE;
       break;
@@ -240,6 +251,8 @@ do {
       $entries[] = json_encode($entry);
     }
   }
+  
+  $first_previous_id = $data->entries[0]->id;
   
   if ($pages > 1 && !empty($entries)) {
     fwrite($fh_tmp, ",\n");
@@ -442,6 +455,8 @@ function save_file($rawdata, $filename) {
 /*
  * ChangeLog:
  *
+ * 1.5 Adds a stronger check on the end of the stream 
+*
  * 1.4 More robust error checking 
  *
  * 1.3 The script is now able to download streams other than the user's own stream 
