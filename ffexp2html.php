@@ -1,6 +1,6 @@
 <?php
 /**
- * FFExp2HTML.php - Converts the output of ffexp.php in HTML - Version 1.0 (2010-22-12)
+ * FFExp2HTML.php - Converts the output of ffexp.php in HTML - Version 1.1 (2015-03-13)
  * Created by Claudio Cicali - <claudio.cicali@gmail.com>
  * Released under the MIT license
  *
@@ -9,6 +9,8 @@
  *
  * As for ffexp.php you need to set the username and the media directory
  * (this is needed to create the correct images and file url)
+ *
+ * You can chose the format of post's author/feeds, too
  *
  * The HTML file will not use external resources (needed images, css and js are all self contained).
  *
@@ -28,6 +30,12 @@ $media_dir = "ff_media";
 
 /* Set a limit to the number of processed entries. "0" means "no limit" */
 $limit = 0;
+
+# The format of post's author/feeds
+#   ""       : Useful for user feed        (default)
+#   "direct" : Useful for direct messages
+#   "group"  : Useful for groups/lists
+$fromto = "";
 
 /**
  * End of configuration options
@@ -55,6 +63,9 @@ if ($row != "[\n") {
   exit();
 }
 
+if (empty($fromto))
+    $fromto = '';   # Set default value
+
 # Let's go fancy
 print "<!doctype html>\n";
 
@@ -80,6 +91,64 @@ while ($row = fgets($fh)) {
     
     if ($limit && ($n == ($limit + 1))) {
       break;
+    }
+
+    $from = '';
+    switch ($fromto)
+    {
+      case 'direct':
+        if ($entry->from->id == $username) {
+          $to = '';
+          foreach($entry->to as $dest) {
+            if ($to)
+              $to .= ', ';
+            $to .= html('a', NULL, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$dest->id}")) . ($dest->name ? $dest->name : '???') . '</a>';
+          }
+          $from = html('p', 'To ' . $to, array('class' => 'e_from'));
+        }
+        else {
+          if (count($entry->to) == 1) {
+            $from = html('p', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}")), array('class' => 'e_from'));
+          }
+          else {
+            $to = '';
+            foreach($entry->to as $dest) {
+              if ($to)
+                $to .= ', ';
+              $to .= html('a', NULL, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$dest->id}")) . ($dest->name ? $dest->name : '???') . '</a>';
+            }
+            $from = html('p', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}")) . ' to ' . $to, array('class' => 'e_from'));
+          }
+        }
+        break;
+      case 'group':
+        if (count($entry->to) == 1) {
+          $from = html('p', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}")), array('class' => 'e_from'));
+        }
+        else {
+          $to = '';
+          foreach($entry->to as $dest) {
+            if ($to)
+              $to .= ', ';
+            $to .= html('a', NULL, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$dest->id}")) . ($dest->name ? $dest->name : '???') . '</a>';
+          }
+          $from = html('p', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}")) . ' to ' . $to, array('class' => 'e_from'));
+        }
+        break;
+      default:
+        if (count($entry->to) == 1) {
+          $from = '';
+        }
+        else {
+          $to = '';
+          foreach($entry->to as $dest) {
+            if ($to)
+              $to .= ', ';
+            $to .= html('a', NULL, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$dest->id}")) . ($dest->name ? $dest->name : '???') . '</a>';
+          }
+          $from = html('p', 'To ' . $to, array('class' => 'e_from'));
+        }
+        break;
     }
 
     $comments = '';
@@ -138,6 +207,7 @@ while ($row = fgets($fh)) {
     $nl = (empty($likes)    ? '0' : count($entry->likes));
     
     $body .= html('li',
+               $from .
                html('p', $entry->body, array('class' => 'e_body')) .
                html('p', 
                  html('span',  html('a', $entry->date, array('class' => 'e_url', 'href' => $entry->url)), array('class' => 'e_date')) .
@@ -296,6 +366,10 @@ function get_css() {
 
   #ff_tools {
     border-bottom: 1px solid silver;
+  }
+  
+  .e_from {
+    font-weight: bold;
   }
   
   .e_comment {
