@@ -140,6 +140,7 @@ while ($row = fgets($fh)) {
     $body .= html('li',
                html('p', $entry->body, array('class' => 'e_body')) .
                html('p', 
+							   html('span', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}"))) . ' &ndash; ' .
                  html('span',  html('a', $entry->date, array('class' => 'e_url', 'href' => $entry->url)), array('class' => 'e_date')) .
                  $via .
                  ' &ndash; ' .
