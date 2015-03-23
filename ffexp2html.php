@@ -136,17 +136,19 @@ while ($row = fgets($fh)) {
         }
         break;
       default:
-        if (count($entry->to) == 1) {
-          $from = '';
-        }
-        else {
-          $to = '';
-          foreach($entry->to as $dest) {
-            if ($to)
-              $to .= ', ';
-            $to .= html('a', NULL, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$dest->id}")) . ($dest->name ? $dest->name : '???') . '</a>';
+        if (property_exists($entry, "to")) {
+          if (count($entry->to) == 1) {
+            $from = '';
           }
-          $from = html('p', 'To ' . $to, array('class' => 'e_from'));
+          else {
+            $to = '';
+            foreach($entry->to as $dest) {
+              if ($to)
+                $to .= ', ';
+              $to .= html('a', NULL, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$dest->id}")) . ($dest->name ? $dest->name : '???') . '</a>';
+            }
+            $from = html('p', 'To ' . $to, array('class' => 'e_from'));
+          }
         }
         break;
     }
