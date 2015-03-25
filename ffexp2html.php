@@ -122,17 +122,19 @@ while ($row = fgets($fh)) {
         }
         break;
       case 'group':
-        if (count($entry->to) == 1) {
-          $from = html('p', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}")), array('class' => 'e_from'));
-        }
-        else {
-          $to = '';
-          foreach($entry->to as $dest) {
-            if ($to)
-              $to .= ', ';
-            $to .= html('a', NULL, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$dest->id}")) . ($dest->name ? $dest->name : '???') . '</a>';
+        if (property_exists($entry, "to")) {
+          if (count($entry->to) == 1) {
+            $from = html('p', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}")), array('class' => 'e_from'));
           }
-          $from = html('p', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}")) . ' to ' . $to, array('class' => 'e_from'));
+          else {
+            $to = '';
+            foreach($entry->to as $dest) {
+              if ($to)
+                $to .= ', ';
+              $to .= html('a', NULL, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$dest->id}")) . ($dest->name ? $dest->name : '???') . '</a>';
+            }
+            $from = html('p', html('a', $entry->from->name, array('class' => 'e_person' , 'href' => "http://friendfeed.com/{$entry->from->id}")) . ' to ' . $to, array('class' => 'e_from'));
+          }
         }
         break;
       default:
